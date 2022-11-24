@@ -2,9 +2,9 @@
       // create Date object for current location
       let date = new Date();
   
-      // convert to msec
+      // convert to milliseconds
       // subtract local time zone offset
-      // get UTC time in msec
+      // get UTC time in milliseconds
       let utc = date.getTime() + (date.getTimezoneOffset() * 60000);
   
       // create new Date object for different city
