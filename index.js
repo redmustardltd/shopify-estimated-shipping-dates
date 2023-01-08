@@ -1,66 +1,45 @@
- function calcTime(offset) {
-      // create Date object for current location
-      let date = new Date();
-  
-      // convert to milliseconds
-      // subtract local time zone offset
-      // get UTC time in milliseconds
-      let utc = date.getTime() + (date.getTimezoneOffset() * 60000);
-  
-      // create new Date object for different city
-      // using supplied offset
-      let newDate = new Date(utc + (3600000*offset));
-  
-      // return time as a string
-      return newDate;
-  }
- 
-    setInterval(function time(){
+function countDown() {
+        // Get the current time in Eastern Time
+        const now = luxon.DateTime.local().setZone("America/New_York");
+        now.setupBusiness();
 
-      let start = new Date();
-      start.setHours(11, 45, 0); // 11:45am
-      let now = start.isDaylightSavingTime() ? calcTime('-4') : calcTime('-5');
-      if (now > start) { // check current time is getter then add one day
-          start.setDate(start.getDate() + 1);
-      }
-    
-        let days = ((start - now) / 1000);
-        let hrs = format((days / 60 / 60) % 60);
-        let min = format((days / 60) % 60);
-        let sec = format(days % 60);
-        
-    timeLeft = "" +hrs+' hours and '+min+' minutes '+sec+' seconds';
-      $("#countdown").html(timeLeft);
-      
-      if(document.getElementById('fromDate')) {
+        // Set the target cutoff time time to 11:30 am Eastern Time
+        let targetTime = now.set({ hour: 11, minute: 30, second: 0 });
 
-        
-        let dateStart = 2;
-        let dateEnd = 3;
-        let fromDate = Date.today().addDays(dateStart);
-        if (fromDate.is().saturday() || fromDate.is().sunday()) { 
-          fromDate = fromDate.next().monday();
+        // If the current time is after 11:30 am, set the target time to the same time on the following business day
+        if (now > targetTime || now.weekday > 5) {
+          targetTime = targetTime.plusBusiness({ days: 1 });
+          while (targetTime.weekday > 5) {
+            targetTime = targetTime.plusBusiness({ days: 1 });
+          }
         }
-        let toDate = Date.today().addDays(dateEnd);
-        if (toDate.is().saturday() || toDate.is().sunday()) { 
-          toDate = toDate.next().monday(); 
-        }
-        if(fromDate.is().friday() && toDate.is().monday()) {
-          fromDate = fromDate.next().monday();
-          toDate = toDate.tuesday();
 
+        // Calculate the time remaining until the target time
+        const remainingTime = targetTime
+          .diff(now, ["hours", "minutes", "seconds"])
+          .toObject();
+
+        document.getElementById("orderBefore").innerHTML = `
+         Order within ${remainingTime.hours} hours, ${remainingTime.minutes} minutes, and ${remainingTime.seconds} seconds
+        `;
+
+        // Change the delivery between dates
+        let earlyDelivery = now.plusBusiness({ days: 2 });
+        let lateDelivery = now.plusBusiness({ days: 3 });
+
+        function formatDate(now) {
+          return now.toLocaleString({
+            weekday: "long",
+            month: "long",
+            day: "2-digit"
+          });
         }
-        if (fromDate.is().monday && toDate.is().monday) {
-          fromDate.addDays(1)
-          toDate.addDays(2)
-        }
-        document.getElementById('fromDate').innerHTML = fromDate.toString('MM/dd');
-        document.getElementById('toDate').innerHTML = toDate.toString('MM/dd');
+
+        document.getElementById("range").innerHTML = `
+        to receive your package between ${formatDate(
+          earlyDelivery
+        )} and ${formatDate(lateDelivery)}.
+          `;
       }
 
-    }, 1000);
-    
-    // Add before 0 of hour, min, sec
-    function format(num) {
-        return ("0" + parseInt(num)).substr(-2);
-    }
+      setInterval(countDown, 1000);
