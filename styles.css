@@ -1,15 +1,13 @@
-.dg-shipping-date {
-    margin:10px 0 10px 0;
-    letter-spacing:0.01em;
-    text-transform: uppercase;
-  }
-  .dg-shipping-date p {
-    color:#333;
-    font-size: 0.9rem;
-    line-height:22px;
-    color:#333;
-  }
-  .dg-shipping-date p span {
-    color:#85783d;
-    font-weight: bold;
-  }
+.shipping-countdown {
+        border: 1px solid black;
+        border-radius: 0.25rem;
+        padding: 1rem;
+      }
+
+      .shipping-countdown-title {
+        font-size: 1.2rem;
+      }
+
+      .shipping-countdown-text {
+        font-size: 1rem;
+      }
